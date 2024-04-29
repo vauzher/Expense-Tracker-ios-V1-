@@ -10,21 +10,31 @@ import SwiftUI
 struct transationcardview: View {
     var expense:Expense
     @EnvironmentObject var expenseViewmodel:Expenseviewmodel
+    
+    let categoryIcons: [String: String] = [
+        "🏅 Bonus" : "🏅",
+        "📈 Investment" : "📈",
+        "⚡️ Others" : "⚡️",
+        "💵 Salary" : "💵",
+        "🍔 Food": "🍔",
+        "🛒 Grocery": "🛒",
+        "📱 Electronic": "📱",
+            // Add more categories and icons as needed
+        ]
+    
     var body: some View {
         HStack(spacing: 12){
             // 7arfa awl bita avatar
-            if let first=expense.remark.first{
-                Text(String(first))
-                    .font(.title.bold())
-                    .foregroundColor(.white)
-                    .frame(width: 50,height: 50)
-                    .background{
-                        Circle()
-                            .fill(Color(expense.color))
+            if let icon = categoryIcons[expense.cat] {
+                            Text(icon)
+                                .font(.title.bold())
+                                .foregroundColor(.white)
+                                .frame(width: 50, height: 50)
+                                .background(Color.blue) // Change the background color or remove it if not needed
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.08), radius: 5, x: 5, y: 5)
+                        }
                         
-                    }
-                    .shadow(color: .black.opacity(0.08), radius: 5,x:5,y:5)
-            }
             Text(expense.remark)
                 .fontWeight(.semibold)
                 .foregroundColor(.black)
@@ -38,7 +48,12 @@ struct transationcardview: View {
                            Text(expenseViewmodel.convertnumbertoprice(value: expense.amount))
                                .font(.callout)
                                .opacity(0.7)
+                Text(expense.date, style: .date)
+                    .font(.caption)
+                    .opacity(0.5)
+                    .foregroundColor(.black)
                        }
+            
         }
         .padding()
         .background{

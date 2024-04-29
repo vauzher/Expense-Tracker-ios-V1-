@@ -21,7 +21,7 @@ struct Home: View {
                             .fontWeight(.semibold)
                             .foregroundColor(.gray)
                         
-                        Text("Ahmed")
+                        Text("Heval")
                             .font(.title2.bold())
                             .foregroundColor(.black)
                      

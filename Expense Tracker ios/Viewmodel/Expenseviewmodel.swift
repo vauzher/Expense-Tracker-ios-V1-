@@ -14,6 +14,7 @@ class ExpenseRealm: Object {
     @objc dynamic var type: String = "" // Assuming you have a string type for expense type
     @objc dynamic var date: Date = Date()
     @objc dynamic var remark: String = ""
+    @objc dynamic var cat: String = ""
     
     override static func primaryKey() -> String? {
         return "id"
@@ -21,6 +22,7 @@ class ExpenseRealm: Object {
 }
 
 class Expenseviewmodel: ObservableObject {
+    
     // prop
     @Published var dataChanged = false // Add this property
     @Published var startdate: Date = Date()
@@ -34,8 +36,8 @@ class Expenseviewmodel: ObservableObject {
         @Published var date: Date = Date()
         @Published var remark: String = ""
         @Published var expenses: [Expense] = [] // Initialize as empty array here
-    
-
+        @Published var cat: String = ""
+        
     
         init() {
             // Initialize ViewModel
@@ -43,7 +45,7 @@ class Expenseviewmodel: ObservableObject {
             let components = calendar.dateComponents([.year, .month], from: Date())
             startdate = calendar.date(from: components)!
             currentmonthstartdate = calendar.date(from: components)!
-            
+//            cat = "Food"
             // Fetch expenses from Realm and populate the expenses array
             expenses = fetchExpensesFromRealm()
         }
@@ -61,7 +63,7 @@ class Expenseviewmodel: ObservableObject {
                     amount: expense.amount,
                     date: expense.date,
                     type: expenseType,
-                    color: "blue" // You might want to add color property here, adjust accordingly
+                    cat: expense.cat// You might want to add color property here, adjust accordingly
                 )
                 expenses.append(mappedExpense)
             }
@@ -98,7 +100,11 @@ class Expenseviewmodel: ObservableObject {
         type = .all
         remark = ""
         amoount = ""
+        cat = ""
     }
+    func reloadExpenses() {
+           expenses = fetchExpensesFromRealm()
+       }
     
     // save data
     func savedata(){
@@ -111,7 +117,7 @@ class Expenseviewmodel: ObservableObject {
             expenseRealm.type = type.rawValue
             expenseRealm.date = date
             expenseRealm.remark = remark
-            
+            expenseRealm.cat = cat
             realm.add(expenseRealm)
         }
         dataChanged = true
@@ -119,6 +125,8 @@ class Expenseviewmodel: ObservableObject {
         // Clear the input fields after saving
         cleardata()
     }
+    
+    
 }
 
 

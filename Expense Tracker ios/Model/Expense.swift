@@ -15,7 +15,7 @@ struct Expense: Identifiable, Hashable {
     var amount: Double
     var date: Date
     var type: ExpenseType
-    var color: String
+    var cat: String
 }
 
 enum ExpenseType: String {
@@ -37,7 +37,7 @@ func fetchExpensesFromRealm() -> [Expense] {
             amount: expense.amount,
             date: expense.date,
             type: expenseType,
-            color: "Blue"
+            cat: expense.cat
         )
         expenses.append(mappedExpense)
     }

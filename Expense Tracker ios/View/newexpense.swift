@@ -13,6 +13,8 @@ struct newexpense: View {
     @EnvironmentObject var expenseviewmodel:Expenseviewmodel
     // enviroment values
     @Environment(\.self) var env
+    
+
     var body: some View {
         VStack{
             VStack(spacing: 15){
@@ -25,11 +27,22 @@ struct newexpense: View {
                 // custom textfield
                 //for currency symbol
                 if let symbol = expenseviewmodel.convertnumbertoprice(value: 0).first{
-                    TextField("0",text: $expenseviewmodel.amoount)
+                    TextField("0", text: Binding(
+                        get: { expenseviewmodel.amoount },
+                        set: { newValue in
+                            let filtered = newValue.filter { "0123456789".contains($0) }
+                            expenseviewmodel.amoount = filtered// Add this line for debugging
+                            if filtered != newValue {
+                                expenseviewmodel.amoount = filtered
+                            }
+                        }
+                    ))
+
                         .font(.system(size: 35))
                         .foregroundColor(Color("grad2"))
                         .multilineTextAlignment(.center)
                         .keyboardType(.numberPad)
+                    
                         .background{
                             Text(expenseviewmodel.amoount == "" ? "0" :
                                     expenseviewmodel.amoount)
@@ -37,10 +50,10 @@ struct newexpense: View {
                             .opacity(0)
                             .foregroundColor(.black)
                             .overlay(alignment:.leading){
-                                Text(String(symbol))
+                                Text(String("$"))
                                     .opacity(0.55)
                                     .offset(x:-15,y:5)
-                                    
+                                
                             }
                         }
                         .padding(.vertical,10)
@@ -57,20 +70,20 @@ struct newexpense: View {
                     TextField("Remark",text:$expenseviewmodel.remark)
                         .padding(.leading,10)
                         .foregroundColor(.black)
-                        
-
+                    
+                    
                 } icon: {
                     Image(systemName: "list.bullet.rectangle.portrait.fill")
                         .font(.title3)
                         .foregroundColor(Color("grey"))
                 }
                 .padding(.vertical,20)
-                    .padding(.horizontal,15)
-                    .background{
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(.white)
-                    }
-                    .padding(.top,25)
+                .padding(.horizontal,15)
+                .background{
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.white)
+                }
+                .padding(.top,25)
                 Label{
                     // check boxes
                     customcheckboxes()
@@ -80,12 +93,45 @@ struct newexpense: View {
                         .foregroundColor(Color("grey"))
                 }
                 .padding(.vertical,20)
-                    .padding(.horizontal,15)
-                    .background{
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(.white)
+                .padding(.horizontal,15)
+                .background{
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.white)
+                }
+                .padding(.top,5)
+                
+                
+                HStack {
+                    Image(systemName: "folder")
+                        .foregroundColor(Color("grey"))
+                        .font(.title3)
+                        .padding(.leading, 10)
+                    
+                    Picker("Category", selection: $expenseviewmodel.cat) {
+                        ForEach(categoriesForSelectedType(), id: \.self) { category in
+                            Text(category)
+                        }
                     }
-                    .padding(.top,5)
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(12)
+                    .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
+                    .padding(.leading, 5)
+                    .padding(.trailing, 10)
+                    .onAppear {
+                        // Set the default value to the first item in categories
+                        expenseviewmodel.cat = categoriesForSelectedType().first ?? ""
+                    }
+                }
+                .padding(.top, 10)
+
+                
+            
+                
+                
+                
                 
                 Label{
                     DatePicker.init("", selection: $expenseviewmodel.date,in:Date.distantPast...Date(),displayedComponents: [.date])
@@ -149,6 +195,17 @@ struct newexpense: View {
             .padding()
         }
     }
+    
+    private func categoriesForSelectedType() -> [String] {
+            switch expenseviewmodel.type {
+            case .income:
+                return ["💵 Salary", "🏅 Bonus", "📈 Investment", "⚡️ Others"]
+            case .expense:
+                return ["🍔 Food", "🛒 Grocery", "📱 Electronic", "⚡️ Others"]
+            case .all:
+                return ["🍔 Food", "🛒 Grocery", "📱 Electronic", "⚡️ Others"]
+            }
+        }
     //check boxes
     @ViewBuilder
     func customcheckboxes()->some View{
